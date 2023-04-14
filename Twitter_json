@@ -1,0 +1,37 @@
+import json
+import pandas as pd
+from datetime import datetime
+from tqdm.notebook import tqdm
+import snscrape.modules.twitter as sntwitter
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        return super().default(obj)
+
+# Scrape the data and create a list of dictionaries called tweets
+scraper = sntwitter.TwitterSearchScraper('#Dhoni')
+tweets = []
+for i, tweet in enumerate(scraper.get_items()):
+    data = {
+        'date': tweet.date,
+        'id': tweet.id,
+        'content': tweet.content,
+        'username': tweet.user.username,
+        'likeCount': tweet.likeCount,
+        'retweetCount': tweet.retweetCount,
+        'sourceUrl': tweet.sourceUrl
+    }
+    tweets.append(data)
+    if i > 50:
+        break
+
+# Save the tweets data to a JSON file
+with open('Twitter-data.json', 'w') as file:
+    json.dump(tweets, file, indent=4, cls=CustomEncoder)
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+the tweets list is saved to a JSON file called Twitter-data.json using the json.dump function. The indent argument is set to 4 to make the output JSON easier to read. The cls argument is set to CustomEncoder to use the custom encoder that was defined earlier to handle datetime objects.
