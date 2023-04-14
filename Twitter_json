@@ -34,4 +34,65 @@ with open('Twitter-data.json', 'w') as file:
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-the tweets list is saved to a JSON file called Twitter-data.json using the json.dump function. The indent argument is set to 4 to make the output JSON easier to read. The cls argument is set to CustomEncoder to use the custom encoder that was defined earlier to handle datetime objects.
+the tweets list is saved to a JSON file called Twitter-data.json using the json.dump function. 
+The indent argument is set to 4 to make the output JSON easier to read. 
+The cls argument is set to CustomEncoder to use the custom encoder that was defined earlier to handle datetime objects.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+import requests
+import json
+import pandas as pd
+from bs4 import BeautifulSoup
+from datetime import datetime
+
+# Set the twitter handle for the user whose tweets we want to scrape
+username = "elonmusk"
+
+# Create an empty list to store the tweets
+tweets = []
+
+# Scrape the tweets using BeautifulSoup
+url = f"https://twitter.com/{username}"
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+
+# Find all the tweet containers
+tweet_containers = soup.find_all('div', {'class': 'tweet'})
+
+# Loop through the tweet containers and extract the relevant data
+for tweet in tweet_containers:
+    # Extract the tweet content
+    content = tweet.find('div', {'class': 'tweet-text'}).text
+    
+    # Extract the tweet timestamp
+    timestamp = datetime.fromtimestamp(int(tweet.find('span', {'class': '_timestamp'})['data-time']))
+    
+    # Extract the tweet ID
+    tweet_id = tweet['data-item-id']
+    
+    # Extract the number of retweets and likes
+    stats = tweet.find_all('span', {'class': 'ProfileTweet-actionCount'})
+    retweets = int(stats[0].text.strip().replace(',', ''))
+    likes = int(stats[1].text.strip().replace(',', ''))
+    
+    # Create a dictionary to store the data for this tweet
+    data = {
+        'id': tweet_id,
+        'content': content,
+        'timestamp': timestamp,
+        'retweets': retweets,
+        'likes': likes
+    }
+    
+    # Add the tweet data to the list of tweets
+    tweets.append(data)
+    print(data)
+
+# Save the tweets to a CSV file
+df = pd.DataFrame(tweets)
+df.to_csv(f"{username}_tweets.csv", index=False)
+
+# Save the tweets to a JSON file
+with open(f"{username}_tweets.json", "w") as file:
+    json.dump(tweets, file, indent=4, default=str)
