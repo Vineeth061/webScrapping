@@ -1,0 +1,43 @@
+from bs4 import BeautifulSoup
+import requests
+
+url = 'https://www.imdb.com/chart/top/'
+
+page = requests.get(url)
+
+print(page) #response 200 
+
+#print(page.text) - gives the source code of the page
+soup = BeautifulSoup(page.text,'lxml')
+
+# print(soup.prettify()) #gives html code
+
+tableofdata = soup.find('table',attrs={'class':'chart full-width'})
+# gives all the content belongs to that table.
+#print(tableofdata)
+tableofrows = tableofdata.find_all('tr') #gives us all the 'tr's 
+#print(tableofrows)
+#movies_data ={}
+listofdata =[]
+for data in tableofrows[1:]:
+  title = data.find('td',{'class':'titleColumn'})
+  #print(title) #returns all the movie titles
+  #print(title.a.text) #gives u all the names from 'a tag in html'
+
+ # movies_data['title']=title
+  rating = data.find('td',{'class':'ratingColumn imdbRating'})
+  #print(rating.strong.text)
+
+  ratingdata = rating.strong.text 
+ # movies_data['rating'] = ratingdata
+
+  #listofdata.append(movies_data)
+  listofdata.append({
+      'title' : title.a.text,
+      'rating':ratingdata
+  })
+
+print(listofdata) #prints data in dictnory format in a list
+
+
+ 
