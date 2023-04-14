@@ -1,0 +1,52 @@
+1. Basic code to get one such data using #
+import pandas as pd
+from tqdm.notebook import tqdm
+import snscrape.modules.twitter as sntwitter
+
+#pulling text and tweet
+
+scraper = sntwitter.TwitterSearchScraper('#kholi')
+for tweet in scraper.get_items():
+  break
+#tweet print(tweet) - gives the url
+ #type is <class 'snscrape.modules.twitter.Tweet'>
+
+data=[
+    tweet.date,
+    tweet.id,
+    tweet.content,
+    tweet.user.username,
+    tweet.likeCount,
+    tweet.retweetCount,
+]
+
+
+2. import pandas as pd
+from tqdm.notebook import tqdm
+import snscrape.modules.twitter as sntwitter
+
+#pulling text and tweet
+
+scraper = sntwitter.TwitterSearchScraper('#Dhoni')
+tweets =[]
+for i,tweet in enumerate(scraper.get_items()): #gives indexing and value
+  data=[
+      tweet.date,
+      tweet.id,
+      tweet.content,
+      tweet.user.username,
+      tweet.likeCount,
+      tweet.retweetCount,
+      tweet.sourceUrl,
+  ]
+  tweets.append(data)
+  if i >50:
+    break
+len(tweets)
+
+tweets_data=pd.DataFrame(tweets,columns=['date','id','content','username','likeCount','retweetCount','sourceUrl'])
+#tweets_data 
+
+tweets_data.to_csv("Twitter-data.csv",index=False)
+
+
