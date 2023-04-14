@@ -1,0 +1,23 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+url = "https://books.toscrape.com/"
+response = requests.get(url)
+soup = BeautifulSoup(response.content, "html.parser")
+
+# Create CSV file and add headers
+with open("book_data.csv", "w", newline="", encoding="utf-8") as csv_file:
+    writer = csv.writer(csv_file)
+    writer.writerow(["Title", "Price", "Availability", "Image URL"])
+
+    # Extract data from website and write to CSV file
+    for book in soup.select("article.product_pod"):
+        title = book.h3.a["title"]
+        price = book.select_one("p.price_color").get_text(strip=True)
+        availability = "In stock" if "In stock" in book.select_one("p.availability").get_text() else "Out of stock"
+        img_url = url + book.select_one("img")["src"][3:]
+
+        writer.writerow([title, price, availability, img_url])
+
+print("Data has been extracted and saved to book_data.csv.")
