@@ -52,7 +52,7 @@ username = "elonmusk"
 # Create an empty list to store the tweets
 tweets = []
 
-# Scrape the tweets using BeautifulSoup
+# Scrape the tweets using BeautifulSoup  
 url = f"https://twitter.com/{username}"
 response = requests.get(url)
 soup = BeautifulSoup(response.text, 'html.parser')
